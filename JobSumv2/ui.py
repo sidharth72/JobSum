@@ -2,10 +2,6 @@ import streamlit as st
 from generate_df import generate_dataframe
 from download_csv import get_table_download_link
 
-headers = {
-    'authorization': st.secrets['auth_token']
-}
-
 
 def extraction_tab():
     st.title("Data Extraction")
