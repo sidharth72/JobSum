@@ -1,7 +1,4 @@
 import streamlit as st
-import pandas as pd
-import base64
-from jobspy import scrape_jobs
 from generate_df import generate_dataframe
 from download_csv import get_table_download_link
 
@@ -22,10 +19,37 @@ def extraction_tab():
         st.markdown(get_table_download_link(df), unsafe_allow_html=True)
 
 
+def api_key_interface():
+    st.title("API Key Interface")
+    api_key = st.text_input("Enter your API Key:")
+    if st.button("Submit API Key"):
+        # Process the API key (you can add your logic here)
+        st.success("API Key submitted successfully!")
+
+
 def chat_tab():
-    st.title("Chat Feature")
-    user_input = st.text_area("Type your message here:")
-    st.write("You:", user_input)
+    st.title("Chat Interface")
+
+    if st.session_state.api_key is None:
+        api_key_interface()
+    else:
+
+        if 'messages' not in st.session_state:
+            st.session_state.messages = []
+
+        for message in st.session_state.messages:
+            with st.chat_message(message['role']):
+                st.markdown(message['content'])
+
+        if prompt := st.chat_input("What is up?"):
+            st.chat_message('user').markdown(prompt)
+            st.session_state.messages.append({'role':'user', 'content':prompt})
+            response = f"Echo: {prompt}"
+
+            with st.chat_message('Assistant'):
+                st.markdown(response)
+
+            st.session_state.messages.append({'role':'assistant', 'content':response})
 
 def visualization_tab():
     st.title("Data Visualization")

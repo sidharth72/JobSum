@@ -1,3 +1,5 @@
+from jobspy import scrape_jobs
+
 def generate_dataframe(site_name, search_term, location = None, results_wanted = None, country = None):
     # Your data processing logic goes here
     # For demonstration purposes, let's create a simple DataFrame

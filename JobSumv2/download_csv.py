@@ -1,3 +1,6 @@
+import pandas as pd
+import base64
+
 def get_table_download_link(df):
     # Generates a link allowing the DataFrame to be downloaded as a CSV file.
     csv = df.to_csv(index=False)
