@@ -2,6 +2,7 @@ import streamlit as st
 from generate_df import generate_dataframe
 from download_csv import get_table_download_link
 from response_generator import chat_with_gemini
+from response_generator import generate_description_string, set_initial_message
 
 # st.set_page_config(
 #     page_title = 'JobSum'
@@ -11,6 +12,10 @@ def extraction_tab():
     st.title("Extract Data")
     st.write('<div style="opacity: 0.7;">Extract data from various sites by providing necessary details.</div>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
+
+    if 'df' not in st.session_state:
+        st.session_state.df = None
+
     site_name = st.selectbox("Select Site Name", ["Indeed", "Linkedin", "Zip_recruiter", "Glassdoor"])
     location = st.text_input("Location", key="location_input", placeholder='Enter Location to search for')
     search_term = st.text_input("Search Term", key="search_term_input", placeholder='Enter Job Role, Eg: Data Scientist')
@@ -24,11 +29,23 @@ def extraction_tab():
     if 'desc_string' not in st.session_state:
         st.session_state.desc_string = ""
 
+
+    # Button 1: Extract Data
     if st.button("Extract Data"):
-        df = generate_dataframe(site_name, search_term, location, results_wanted, country)
-        st.session_state.desc_string = '\n'.join(f'{i + 1}. {desc}' for i, desc in enumerate(df['description'][:results_wanted], start=0))
-        st.dataframe(df)
-        st.markdown(get_table_download_link(df), unsafe_allow_html=True)
+        with st.spinner("Extracting information ... Please Wait"):
+            df = generate_dataframe(site_name, search_term, location, results_wanted, country)
+            st.session_state.desc_string = generate_description_string(df, 30)
+
+        with st.spinner("Updating data frame..."):
+            st.dataframe(df)
+        
+        with st.spinner("Setting the initial Message to the Chat Model ... "):
+            set_initial_message()
+
+        with st.spinner("Generating download link ..."):
+            st.markdown(get_table_download_link(df), unsafe_allow_html=True)
+            st.session_state.df = df
+
 
 
 def api_key_interface():
@@ -39,25 +56,30 @@ def api_key_interface():
         st.success("API Key submitted successfully!")
 
 
-def chat_tab():
-    st.title("Chat With Gemini")
+if 'messages' not in st.session_state.keys():
+    st.session_state.messages = [{'role':'assistant', 'content':'How may I help you?'}]
 
-    if 'messages' not in st.session_state:
-        st.session_state.messages = []
+
+def chat_tab():
+    st.title("Chat With Me!")
 
     for message in st.session_state.messages:
         with st.chat_message(message['role']):
-            st.markdown(message['content'])
+            st.write(message['content'])
 
-    if prompt := st.chat_input("What is up?"):
-        st.chat_message('user').markdown(prompt)
+    if prompt := st.chat_input():
         st.session_state.messages.append({'role':'user', 'content':prompt})
-        response = f"Echo: {prompt}"
+        with st.chat_message('user'):
+            st.write(prompt)
 
-        with st.chat_message('Assistant'):
-            response = st.write_stream(chat_with_gemini(prompt))
+    if st.session_state.messages[-1]['role'] != 'assistant':
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking ... "):
+                response = chat_with_gemini(prompt)
+                st.write(response)
 
-        st.session_state.messages.append({'role':'assistant', 'content':response})
+        message = {'role':'assistant', 'content':response}
+        st.session_state.messages.append(message)
 
 def visualization_tab():
     st.title("Data Visualization")
