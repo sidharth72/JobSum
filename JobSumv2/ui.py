@@ -3,13 +3,15 @@ from generate_df import generate_dataframe
 from download_csv import get_table_download_link
 from response_generator import chat_with_gemini
 from response_generator import generate_description_string, set_initial_message
+from visualization import count_occurrences, remove_outliers, generate_visualizations
+import matplotlib.pyplot as plt
 
 # st.set_page_config(
 #     page_title = 'JobSum'
 # )
 
 def extraction_tab():
-    st.title("Extract Data")
+    st.title("Fetch Job Details.")
     st.write('<div style="opacity: 0.7;">Extract data from various sites by providing necessary details.</div>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -24,27 +26,38 @@ def extraction_tab():
         country = st.text_input("Country", key="country_input", placeholder='Enter Country')
     else:
         country = st.text_input("Country", key="country_input", placeholder='Enter Country', disabled=True)
+
+    if site_name == 'Linkedin':
+        st.warning("Selecting LinkedIn might not provide job descriptions, which could limit the model's ability to generate responses accurately.")
     
     # Check if 'desc_string' is not in session_state, initialize it
     if 'desc_string' not in st.session_state:
         st.session_state.desc_string = ""
 
-
     # Button 1: Extract Data
     if st.button("Extract Data"):
-        with st.spinner("Extracting information ... Please Wait"):
+        with st.spinner("Extracting information ... Please Wait"):      
             df = generate_dataframe(site_name, search_term, location, results_wanted, country)
-            st.session_state.desc_string = generate_description_string(df, 30)
+            st.session_state.df = df
+            try:
+                st.session_state.desc_string = generate_description_string(df, 30)
+            except:
+                st.error("Model Got few information!")
 
-        with st.spinner("Updating data frame..."):
-            st.dataframe(df)
+            #st.error("Cannot able to parse the content! Please try other keywords.")
+
+        # with st.spinner("Updating data frame..."):
+        #     st.dataframe(df)
         
-        with st.spinner("Setting the initial Message to the Chat Model ... "):
+        with st.spinner("Model Understanding Context ... Please Wait"):
             set_initial_message()
 
         with st.spinner("Generating download link ..."):
             st.markdown(get_table_download_link(df), unsafe_allow_html=True)
-            st.session_state.df = df
+
+    st.dataframe(st.session_state.df)
+    if 'df' in st.session_state:
+        st.write("***The Chat Model is all set. Headover to the chat tab to start chatting***")
 
 
 
@@ -61,7 +74,7 @@ if 'messages' not in st.session_state.keys():
 
 
 def chat_tab():
-    st.title("Chat With Me!")
+    st.title("Converse with Model.")
 
     for message in st.session_state.messages:
         with st.chat_message(message['role']):
@@ -81,22 +94,33 @@ def chat_tab():
         message = {'role':'assistant', 'content':response}
         st.session_state.messages.append(message)
 
+
+
+
 def visualization_tab():
-    st.title("Data Visualization")
-    chart_data = {'x': [1, 2, 3, 4, 5], 'y': [10, 20, 30, 40, 50]}
-    st.line_chart(chart_data)
+    st.title("Data Summary & Insights")
+        
+    # Button to generate visualizations
+    if st.button("Visual Insights", key="generate_button", help="Click to generate visualizations"):
+        with st.spinner("Generating Visualizations..."):
+            if 'fig' not in st.session_state:
+                fig = generate_visualizations()
+                st.plotly_chart(fig)
+            else:
+                st.plotly_chart(st.session_state.fig)
+
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Streamlit Tab Example")
 
     # Create tabs
-    tabs = ["Extraction", "Chat", "Visualization", "Other Tab"]
+    tabs = ["Data Extraction", "Model Conversation", "Data Summary & Insights", "Other Tab"]
     current_tab = st.sidebar.selectbox("Select Tab", tabs)
-    if current_tab == "Extraction":
+    if current_tab == "Data Extraction":
         extraction_tab()
-    elif current_tab == "Chat":
+    elif current_tab == "Model Conversation":
         chat_tab()
-    elif current_tab == "Visualization":
+    elif current_tab == "Data Summary & Insights":
         visualization_tab()
     elif current_tab == "Other Tab":
         st.title("Content for Other Tab")

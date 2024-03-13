@@ -8,6 +8,8 @@ import streamlit as st
 #from langchain.memory import ConversationBufferMemory
 import google.generativeai as genai
 from config import API_KEY
+import re
+import json
 
 genai.configure(api_key = API_KEY)
 
@@ -33,4 +35,36 @@ def set_initial_message():
     except:
         pass
 
-print(chat.history)
+def get_json():
+    prompt = """
+        Extract a bunch of relevant keywords related to this job role. Here is how the format needed:
+
+            General Kewords (List[words]):
+            Skills (List[words]):
+            Qualification (List[words]):
+            Soft Skills (List[words]):
+            Additional (List[words]):
+            Other (List[words]):
+
+            Instructions while filling:
+
+            1. Fill those and give it as a JSON file, values must be a list.
+            2. Don't Give any other suggestion or comments.
+            3. Each Items inside the list must be a one word string or number (as required).
+            4. Fill all the fields, its mandatory.
+
+        """
+    try:
+        response = chat.send_message(prompt)
+        return response.text
+    except:
+        st.error("An Error Occured! Please Try Again.")
+    
+def preprocess_json_string(json_string):
+    inner_json_match = re.search(r'{(.+)}', json_string, re.DOTALL)
+    if inner_json_match:
+        inner_json = '{' + inner_json_match.group(1) + '}'
+        json_to_dict = json.loads(inner_json)
+        return json_to_dict
+    else:
+        st.error("Parse Error! Try Again!")
