@@ -11,7 +11,8 @@ from config import API_KEY
 import re
 import json
 
-genai.configure(api_key = API_KEY)
+
+genai.configure(api_key = st.secrets['API_KEY'])
 
 model = genai.GenerativeModel('gemini-pro')
 chat = model.start_chat(history = [])
@@ -26,10 +27,14 @@ def chat_with_gemini(prompt):
     #     yield word + " "
     #     time.sleep(0.05)
 
-def generate_description_string(df, slice_number):
-    return '\n'.join(f'{i + 1}. {desc}' for i, desc in enumerate(df['description'][:slice_number], start=0))
+def generate_description_string(df, slice_number, full = False):
+    if not full:
+        return '\n'.join(f'{i + 1}. {desc}' for i, desc in enumerate(df['description'][:slice_number], start=0))
+    else:
+        return '\n'.join(f'{i + 1}. {desc}' for i, desc in enumerate(df['description'], start = 0))
 
 def set_initial_message():
+    chat.history.clear()
     try:
         chat.send_message(st.session_state.desc_string)
     except:

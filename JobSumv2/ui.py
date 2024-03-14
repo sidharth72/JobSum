@@ -3,7 +3,7 @@ from generate_df import generate_dataframe
 from download_csv import get_table_download_link
 from response_generator import chat_with_gemini
 from response_generator import generate_description_string, set_initial_message
-from visualization import count_occurrences, remove_outliers, generate_visualizations
+from visualization import count_occurrences, remove_outliers, generate_bar_plots, generate_pie_plots
 import matplotlib.pyplot as plt
 
 # st.set_page_config(
@@ -40,7 +40,7 @@ def extraction_tab():
             df = generate_dataframe(site_name, search_term, location, results_wanted, country)
             st.session_state.df = df
             try:
-                st.session_state.desc_string = generate_description_string(df, 30)
+                st.session_state.desc_string = generate_description_string(df, 30, False)
             except:
                 st.error("Model Got few information!")
 
@@ -56,8 +56,8 @@ def extraction_tab():
             st.markdown(get_table_download_link(df), unsafe_allow_html=True)
 
     st.dataframe(st.session_state.df)
-    if 'df' in st.session_state:
-        st.write("***The Chat Model is all set. Headover to the chat tab to start chatting***")
+    # if st.session_state.df:
+    #     st.write("***The Chat Model is all set. Headover to the chat tab to start chatting***")
 
 
 
@@ -80,7 +80,7 @@ def chat_tab():
         with st.chat_message(message['role']):
             st.write(message['content'])
 
-    if prompt := st.chat_input():
+    if prompt := st.chat_input("Eg: What are the key insights can you provide from the job descriptions?"):
         st.session_state.messages.append({'role':'user', 'content':prompt})
         with st.chat_message('user'):
             st.write(prompt)
@@ -98,23 +98,43 @@ def chat_tab():
 
 
 def visualization_tab():
-    st.title("Data Summary & Insights")
-        
-    # Button to generate visualizations
-    if st.button("Visual Insights", key="generate_button", help="Click to generate visualizations"):
-        with st.spinner("Generating Visualizations..."):
-            if 'fig' not in st.session_state:
-                fig = generate_visualizations()
-                st.plotly_chart(fig)
-            else:
-                st.plotly_chart(st.session_state.fig)
+    st.title("Data Summary & Insights.")
+
+    tab1, tab2 = st.tabs(['Bar Plots', 'Pie Charts'])
+
+    with tab1:         
+        # Button to generate visualizations
+        if st.button("Show Bar Plot", key="generate_barplot", help="Click to generate bar plots"):
+            with st.spinner("Generating Barplot ... Please wait"):
+                if 'barplot' not in st.session_state:
+                    try:
+                        fig = generate_bar_plots()
+                        st.plotly_chart(fig)
+                    except:
+                        st.error("Sorry, the model not able to generate visuals. Please try extracting again")
+                else:
+                    st.plotly_chart(st.session_state.barplot)
+
+    with tab2:
+                # Button to generate visualizations
+        if st.button("Show Pie Chart", key="generate_pieplot", help="Click to generate pie charts"):
+            with st.spinner("Generating Pie Chart ... Please Wait"):
+                if 'pieplot' not in st.session_state:
+                    try:
+                            
+                        fig = generate_pie_plots()
+                        st.plotly_chart(fig)
+                    except:
+                        st.error("Sorry, the model not able to generate visuals. Please try extracting again")
+                else:
+                    st.plotly_chart(st.session_state.pieplot)
 
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Streamlit Tab Example")
 
     # Create tabs
-    tabs = ["Data Extraction", "Model Conversation", "Data Summary & Insights", "Other Tab"]
+    tabs = ["Data Extraction", "Model Conversation", "Data Summary & Insights", "Help", "About"]
     current_tab = st.sidebar.selectbox("Select Tab", tabs)
     if current_tab == "Data Extraction":
         extraction_tab()
@@ -122,6 +142,8 @@ if __name__ == "__main__":
         chat_tab()
     elif current_tab == "Data Summary & Insights":
         visualization_tab()
-    elif current_tab == "Other Tab":
+    elif current_tab == "Help":
         st.title("Content for Other Tab")
+    elif current_tab == "About":
+        st.title("About")
         # Add content for other tabs as needed
