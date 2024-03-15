@@ -7,7 +7,7 @@ import time
 import streamlit as st
 #from langchain.memory import ConversationBufferMemory
 import google.generativeai as genai
-from config import API_KEY
+#from config import API_KEY
 import re
 import json
 
