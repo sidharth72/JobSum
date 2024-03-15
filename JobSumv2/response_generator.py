@@ -12,7 +12,7 @@ import re
 import json
 
 
-genai.configure(api_key = API_KEY)
+genai.configure(api_key = st.secrets['API_KEY'])
 
 model = genai.GenerativeModel('gemini-pro')
 chat = model.start_chat(history = [])
