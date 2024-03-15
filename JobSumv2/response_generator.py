@@ -7,12 +7,12 @@ import time
 import streamlit as st
 #from langchain.memory import ConversationBufferMemory
 import google.generativeai as genai
-#from config import API_KEY
+from config import API_KEY
 import re
 import json
 
 
-genai.configure(api_key = st.secrets['API_KEY'])
+genai.configure(api_key = API_KEY)
 
 model = genai.GenerativeModel('gemini-pro')
 chat = model.start_chat(history = [])
@@ -34,6 +34,7 @@ def generate_description_string(df, slice_number, full = False):
         return '\n'.join(f'{i + 1}. {desc}' for i, desc in enumerate(df['description'], start = 0))
 
 def set_initial_message():
+    # Clearning the chat history when user creates new dataset
     chat.history.clear()
     try:
         chat.send_message(st.session_state.desc_string)
