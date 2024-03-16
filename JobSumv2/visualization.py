@@ -3,6 +3,7 @@ import numpy as np
 from response_generator import get_json, preprocess_json_string
 import plotly.graph_objs as go
 from response_generator import generate_description_string
+from response_generator import get_title_counts
 
 def count_occurrences(data_dict):
     occurrences = {}
@@ -39,10 +40,6 @@ def remove_outliers(data_dict, multiplier=2.5):
     return cleaned_data, removed_keys
 
 def generate_bar_plots():
-    # if 'json_model_response' not in st.session_state:
-    #     json_model_response = get_json()
-    #     st.session_state.json_model_response = json_model_response
-
     json_model_response = get_json()
     json_cleaned = preprocess_json_string(json_model_response)
     occurrence = count_occurrences(json_cleaned)
@@ -75,35 +72,27 @@ def generate_bar_plots():
     return bar
 
 
-def generate_pie_plots():
-    # if 'json_model_response' not in st.session_state:
-    #     json_model_response = get_json()
-    #     st.session_state.json_model_response = json_model_response
+def generate_pie_plots(threshold):
 
-    json_model_response = get_json()
-    json_cleaned = preprocess_json_string(json_model_response)
-    occurrence = count_occurrences(json_cleaned)
-    cleaned_data, _ = remove_outliers(occurrence)
-    
-    # Plot each category horizontally with Plotly
-    categories = list(cleaned_data.keys())
+    counts, labels = get_title_counts(st.session_state.df)
+    num_elements = len(counts)
+    portion = int(num_elements * threshold)
+    counts = counts[:portion]
+    labels = labels[:portion]
 
     # Create a figure with subplots for each category
     pie = go.Figure()
-    for i, category in enumerate(categories):
-        values = list(cleaned_data[category].values())
-        labels = list(cleaned_data[category].keys())
 
-        # Add pie chart trace
-        pie.add_trace(go.Pie(
-            labels=labels,  # Use the same labels as the last category for the pie chart
-            values=values,  # Use the same values as the last category for the pie chart
-            name="Pie Chart"
-        ))
+    # Add pie chart trace
+    pie.add_trace(go.Pie(
+        labels=labels,  # Use the same labels as the last category for the pie chart
+        values=counts,  # Use the same values as the last category for the pie chart
+        name="Pie Chart"
+    ))
 
     # Update layout
     pie.update_layout(
-        title="Data Summary & Insights",
+        title="Proportion of Different Jobs",
         yaxis=dict(title="Values"),
         xaxis=dict(title="Counts")
     )

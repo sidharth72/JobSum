@@ -3,12 +3,11 @@ from generate_df import generate_dataframe
 from download_csv import get_table_download_link
 from response_generator import chat_with_gemini
 from response_generator import generate_description_string, set_initial_message
-from visualization import count_occurrences, remove_outliers, generate_bar_plots, generate_pie_plots
-import matplotlib.pyplot as plt
-import os
-
+from visualization import generate_bar_plots, generate_pie_plots
 
 def extraction_tab():
+    """Data Extraction Tab"""
+
     st.title("Fetch Job Details.")
     st.write(
         '<div style="opacity: 0.7;">Extract data from various sites by providing necessary details.</div>',
@@ -47,32 +46,39 @@ def extraction_tab():
     # Button 1: Extract Data
     if st.button("Extract Data"):
         
+        # Setting plots to None when use extracts new data
         st.session_state.barplot = None
         st.session_state.pieplot = None
 
-        with st.spinner("Extracting information ... Please Wait"):      
-            df = generate_dataframe(site_name, search_term, location, results_wanted, country)
-            st.session_state.df = df
+        with st.spinner("Extracting information ... Please Wait"):  
             try:
+                # Generate the dataframe from details
+                df = generate_dataframe(site_name, search_term, location, results_wanted, country)
+                st.session_state.df = df  # Add to the session_state
+
+                # Description String combines all the description generated for the model to summarize   
                 st.session_state.desc_string = generate_description_string(df, 30, False)
-            except:
-                st.error("Model Got few information!")
+            except Exception as e:
+                st.error(f"Sorry, there is a problem: {e}")
         
-        with st.spinner("Model Understanding Context ... Please Wait"):
+        # Passing the initial System Message
+        with st.spinner("AI Understanding Context ... Please Wait"):
             set_initial_message()
 
         with st.spinner("Generating download link ..."):
-            st.markdown(get_table_download_link(df), unsafe_allow_html=True)
+            try:
+                st.markdown(get_table_download_link(df), unsafe_allow_html=True)
+            except:
+                pass
 
     st.dataframe(st.session_state.df)
-    # if st.session_state.df:
-    #     st.write("***The Chat Model is all set. Headover to the chat tab to start chatting***")
 
 if 'messages' not in st.session_state.keys():
     st.session_state.messages = [{'role':'assistant', 'content':'How may I help you?'}]
 
 def chat_tab():
-    st.title("Converse with Model.")
+    """Chat Interface"""
+    st.title("Converse with AI.")
 
     for message in st.session_state.messages:
         with st.chat_message(message['role']):
@@ -93,45 +99,63 @@ def chat_tab():
         st.session_state.messages.append(message)
 
 def visualization_tab():
+    """Visualization Interface"""
     st.title("Data Summary & Insights.")
 
     tab1, tab2 = st.tabs(['Bar Plots', 'Pie Charts'])
 
-    with tab1:         
+    with tab1:      
         if st.button("Show Bar Plot", key="generate_barplot", help="Click to generate bar plots"):
-            with st.spinner("Generating Barplot ... Please wait"):
-                if st.session_state.barplot is None:
-                    try:
-                        st.session_state.barplot = generate_bar_plots()
+            if st.session_state.df is None:
+                st.warning("Dataset not available!")
+            else:
+                with st.spinner("Generating Barplot ... Please wait"):
+                    if st.session_state.barplot is None:
+                        try:
+                            st.session_state.barplot = generate_bar_plots()
+                            st.plotly_chart(st.session_state.barplot)
+                        except:
+                            st.error(f"Sorry, the model not able to generate visuals. Please try extracting again")
+                    else:
                         st.plotly_chart(st.session_state.barplot)
-                    except:
-                        st.error(f"Sorry, the model not able to generate visuals. Please try extracting again")
-                else:
-                    st.plotly_chart(st.session_state.barplot)
 
     with tab2:
-        if st.button("Show Pie Chart", key="generate_pieplot", help="Click to generate pie charts"):
-            with st.spinner("Generating Pie Chart ... Please Wait"):
-                if st.session_state.pieplot is None:
-                    try:   
-                        st.session_state.pieplot = generate_pie_plots()
-                        st.plotly_chart(st.session_state.pieplot)
-                    except:
-                        st.error("Sorry, the model not able to generate visuals. Please try extracting again")
+        col1, col2 = st.columns(2)
+        col2.markdown("<div style='width: 1px; height: 28px;'></div>", unsafe_allow_html=True)
+        with col1:
+            threshold_setting =  st.selectbox("Select Threshold", 
+                                              [0.2, 0.5, 0.7], 
+                                              help="What portion of the data is needed for plotting?"
+                                              )
+            
+        with col2:
+            if st.button("Show Pie Chart", key="generate_pieplot", help="Click to generate pie charts"):
+                if st.session_state.df is None:
+                    st.warning("Dataset not available!")
                 else:
-                    st.plotly_chart(st.session_state.pieplot)
+                    with st.spinner("Generating Pie Chart ... Please Wait"):
+                        previous_threshold = st.session_state.get('previous_threshold', None)
+                        if st.session_state.pieplot is None or threshold_setting != previous_threshold: 
+                            try:   
+                                st.session_state.pieplot = generate_pie_plots(threshold_setting)
+                                st.plotly_chart(st.session_state.pieplot)
+                                st.session_state.previous_threshold = threshold_setting
+                            except:
+                                st.error("Sorry, the model not able to generate visuals. Please try extracting again")
+                        else:
+                            st.plotly_chart(st.session_state.pieplot)
                     
 
 
 if __name__ == "__main__":
-    st.set_page_config(page_title="Streamlit Tab Example")
+    st.set_page_config(page_title="JobSum - Job Summary & Analysis")
 
     # Create tabs
-    tabs = ["Data Extraction", "Model Conversation", "Data Summary & Insights", "Help", "About"]
+    tabs = ["Data Extraction", "AI Conversation", "Data Summary & Insights", "Help", "About"]
     current_tab = st.sidebar.selectbox("Select Tab", tabs)
     if current_tab == "Data Extraction":
         extraction_tab()
-    elif current_tab == "Model Conversation":
+    elif current_tab == "AI Conversation":
         chat_tab()
     elif current_tab == "Data Summary & Insights":
         visualization_tab()
@@ -139,4 +163,3 @@ if __name__ == "__main__":
         st.title("Content for Other Tab")
     elif current_tab == "About":
         st.title("About")
-        # Add content for other tabs as needed
