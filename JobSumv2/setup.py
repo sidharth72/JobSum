@@ -5,6 +5,42 @@ from response_generator import chat_with_gemini
 from response_generator import generate_description_string, set_initial_message
 from visualization import generate_bar_plots, generate_pie_plots
 
+
+def home_tab():
+    """ Home Tab"""
+    # Title
+    st.title("""Welcome to JobSum!""")
+    # Description
+    st.write("""
+### **Introduction**
+
+**JobSum** is a job summarization and chatting app build using streamlit designed to make your job search process easier and more efficient. By utilizing data scraped from popular websites like Indeed, LinkedIn, Glassdoor, ZipRecruiter, and more, this tool provides a personalized and comprehensive job summary for each search query. Let's dive into how this tool works and the features it offers.
+
+### How it Works
+
+The JobSum tool leverages an advanced LLM model (Gemini-Google) to analyze and understand hundreds of job descriptions in a matter of seconds. The AI can extract essential information such as required skills, experience levels, interview insights, and can give tutorials and guides to refer for the job. This process saves you valuable time that would otherwise be spent manually reading through numerous job postings.
+
+### Features
+
+* **Job Summarization:** The AI tool generates a concise summary of each job description, highlighting key details to help you understand the job requirements at a glance.
+* **Skill Matching:** It identifies the most relevant skills needed for a particular job, making it easier for you to tailor your resume and cover letter accordingly.
+* **Interview Insights:** Based on the job descriptions, you can ask the AI to provide interview questions and tips based on the job description.
+* **Chat Functionality:** You can interact with the AI to ask questions about specific job preferences or seek advice on career-related topics.
+* **Visualizations:** obSum provides graphical representations of the data generated, offering a visual understanding of important factors to consider when applying for a job. You can explore different terms, positions within the same job category, and other valuable insights through these visualizations.
+
+## Links:
+https://github.com/sidharth72/JobSum
+             
+https://www.linkedin.com/in/sidharth-gn-4ab311208/        
+""")
+
+
+    # Welcome contribution message
+    st.write("### Welcome Contributions!")
+    st.write("We welcome contributions from the community to improve JobSum. Whether it's adding new features, fixing bugs, or enhancing documentation, every contribution matters!")
+
+
+
 def extraction_tab():
     """Data Extraction Tab"""
 
@@ -146,13 +182,14 @@ def visualization_tab():
                             st.plotly_chart(st.session_state.pieplot)
                     
 
-
 if __name__ == "__main__":
     st.set_page_config(page_title="JobSum - Job Summary & Analysis")
 
     # Create tabs
-    tabs = ["Data Extraction", "AI Conversation", "Data Summary & Insights", "Help", "About"]
+    tabs = ["Home", "Data Extraction", "AI Conversation", "Data Summary & Insights", "Help", "About"]
     current_tab = st.sidebar.selectbox("Select Tab", tabs)
+    if current_tab == "Home":
+        home_tab()
     if current_tab == "Data Extraction":
         extraction_tab()
     elif current_tab == "AI Conversation":

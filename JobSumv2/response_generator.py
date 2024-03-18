@@ -76,3 +76,4 @@ def get_title_counts(df):
     sorted_pairs = sorted(zip(job_counts, labels), reverse = True)
     sorted_counts, sorted_labels = zip(*sorted_pairs)
     return list(sorted_counts), list(sorted_labels)
+
