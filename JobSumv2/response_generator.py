@@ -7,13 +7,14 @@ import json
 
 genai.configure(api_key = st.secrets['API_KEY'])
 
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.0-pro')
 chat = model.start_chat(history = [])
 
 def chat_with_gemini(prompt):
     try:
-        response = chat.send_message(prompt)
-        return response.text
+        response = chat.send_message(prompt, stream = True)
+        for chunk in response:
+            yield chunk.text
     except:
         return st.error("An Error Occured! Please Try Again.")
 

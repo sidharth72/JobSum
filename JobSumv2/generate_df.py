@@ -1,5 +1,4 @@
 from jobspy import scrape_jobs
-import streamlit as st
 
 def generate_dataframe(site_name, search_term, location = None, results_wanted = None, country = None):
     params = {
