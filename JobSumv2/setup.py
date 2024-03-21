@@ -44,14 +44,14 @@ def home_tab():
 def extraction_tab():
     """Data Extraction Tab"""
 
-    st.title("Fetch Job Details.")
+    st.title("Fetch Job Data.")
     st.write(
         '<div style="opacity: 0.7;">Extract data from various sites by providing necessary details.</div>',
             unsafe_allow_html=True
         )
     st.markdown("<br>", unsafe_allow_html=True)
 
-    with st.expander("Data Extraction Tips", expanded=True):
+    with st.expander("💡 Tips", expanded=False):
         st.write(
         """
            * If your job title is uncommon, it's best to skip location details as they further narrow down the dataset.
@@ -60,6 +60,7 @@ def extraction_tab():
            * Keep in mind that LinkedIn might not always provide job descriptions, which can affect the AI's ability to summarize data accurately.
            * Make sure your search term includes the job role you're looking for.
            * Results wanted are limited to 500 results as of now, the later update will include more quantity.
+           * Please make sure you are not clicking the extract button when the process is already running.
         """
         )
 
@@ -91,6 +92,9 @@ def extraction_tab():
     if 'desc_string' not in st.session_state:
         st.session_state.desc_string = ""
 
+    if 'search_term' not in st.session_state:
+        st.session_state.search_term = search_term
+
     extract_button = None
     if search_term  == "":
         extract_button = st.button('Extract Data', key = "extract_button_disabled", disabled=True)
@@ -106,7 +110,8 @@ def extraction_tab():
         st.session_state.bubbleplot = None
         st.session_state.messages = [{'role':'assistant', 'content':'How may I help you?'}]
 
-        with st.spinner("Extracting information ... Please Wait"):  
+        with st.status("Extracting Data ... Please Wait", expanded=True):  
+            st.write("Generating DataFrame ...")
             try:
                 # Generate the dataframe from details
                 df = generate_dataframe(site_name, search_term, location, results_wanted, country)
@@ -114,12 +119,18 @@ def extraction_tab():
 
                 # Description String combines all the description generated for the model to summarize   
                 st.session_state.desc_string = generate_description_string(df, 30, False)
+                st.success("Data Extraction Complete!")
             except Exception as e:
                 st.error(f"Sorry, there is a problem: {e}")
         
         # Passing the initial System Message
-        with st.spinner("AI Understanding Context ... Please Wait"):
-            set_initial_message()
+        with st.status("Fetching Descriptions ... Please Wait", expanded = True):
+            st.write("Setting Descriptions ... This will take a few moments.")
+            try:
+                set_initial_message()
+                st.success("Descriptions Set Successfully!")
+            except Exception as e:
+                st.error(f"Sorry, there is a problem: {e}")
 
         with st.spinner("Generating download link ..."):
             try:
@@ -136,7 +147,7 @@ def chat_tab():
     """Chat Interface"""
     st.title("Converse with AI.")
 
-    with st.expander("Chat Interface Tips"):
+    with st.expander("💡 Tips"):
         st.write(
         """
         
@@ -145,6 +156,22 @@ def chat_tab():
 
         """
         )
+    with st.expander("💡 Example Prompts"):
+        try:
+            st.write(
+                f"""
+                    * Identify the top 5 skills mentioned across all job descriptions.
+                    * What are the most common experience levels required for jobs?
+                    * What are the emerging job trends in the {st.session_state.search_term} based on recent job descriptions?
+                    * Which locations have the highest demand for {st.session_state.search_term} positions?
+                    * Can you summarize the primary responsibilities mentioned in job descriptions for {st.session_state.search_term}?
+                    * Can you identify any patterns related to remote work or flexible schedules in the job descriptions?
+                    * Do job descriptions from different regions emphasize different aspects? If so, what are they?
+                    * What soft skills are frequently mentioned in job postings?
+                """
+            )
+        except:
+            pass
 
     for message in st.session_state.messages:
         with st.chat_message(message['role']):
@@ -169,7 +196,7 @@ def visualization_tab():
     tab1, tab2, tab3 = st.tabs(['Bar Plots', 'Pie Charts', 'Bubble Plots'])
 
     with tab1:      
-        if 'df' not in st.session_state:
+        if 'df' not in st.session_state or st.session_state.df is None:
             st.warning("Dataset not available!")
         else:
             with st.spinner("Generating Barplot ... Please wait"):
@@ -192,12 +219,12 @@ def visualization_tab():
                                               )
             
         with col1:
-            if 'df' not in st.session_state:
+            if 'df' not in st.session_state or st.session_state.df is None:
                 st.warning("Dataset not available!")
             else:
                 with st.spinner("Generating Pie Chart ... Please Wait"):
                     previous_threshold = st.session_state.get('previous_threshold', None)
-                    if st.session_state.pieplot is None or threshold_setting != previous_threshold: 
+                    if st.session_state.pieplot is None or threshold_setting != previous_threshold:
                         try:   
                             st.session_state.pieplot = generate_pie_plots(threshold_setting)
                             st.plotly_chart(st.session_state.pieplot)
@@ -209,7 +236,7 @@ def visualization_tab():
 
 
     with tab3:      
-        if 'df' not in st.session_state:
+        if 'df' not in st.session_state or st.session_state.df is None:
             st.warning("Dataset not available!")
         else:
             with st.spinner("Generating Bubble Plot ... Please wait"):
@@ -229,15 +256,15 @@ if __name__ == "__main__":
     # Create tabs
     tabs = ["Home", "Data Extraction", "AI Conversation", "Data Summary & Insights", "About"]
     current_tab = st.sidebar.selectbox("Current Tab", tabs)
+
+    # Display content based on the selected tab
     if current_tab == "Home":
         home_tab()
-    if current_tab == "Data Extraction":
+    elif current_tab == "Data Extraction":
         extraction_tab()
     elif current_tab == "AI Conversation":
         chat_tab()
     elif current_tab == "Data Summary & Insights":
         visualization_tab()
-    elif current_tab == "Help":
-        st.title("Content for Other Tab")
     elif current_tab == "About":
         st.title("About")

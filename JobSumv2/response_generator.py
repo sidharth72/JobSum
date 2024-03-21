@@ -15,8 +15,14 @@ def chat_with_gemini(prompt):
         response = chat.send_message(prompt, stream = True)
         for chunk in response:
             yield chunk.text
-    except:
-        return st.error("An Error Occured! Please Try Again.")
+        
+        # Remove some chats from the history to reduce input overload to the model.
+        if len(chat.history) > 10:
+            indices_to_delete = list(range(1, len(chat.history) - 3))
+            for index in sorted(indices_to_delete, reverse=True):
+                del chat.history[index] 
+    except Exception as e:
+        return st.error(f"An Error Occured! Please Try Again. {e}")
 
 
 def generate_description_string(df, slice_number, full = False):

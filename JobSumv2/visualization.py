@@ -102,7 +102,7 @@ def generate_bubble_plots():
 
     # Update layout
     bubble.update_layout(
-        title="Data Summary & Insights",
+        title="Bubble Plot of Important Job Requirements",
         xaxis=dict(title="Labels"),
         yaxis=dict(title="Values"),
         showlegend=True
@@ -131,7 +131,7 @@ def generate_pie_plots(threshold):
 
     # Update layout
     pie.update_layout(
-        title="Proportion of Different Jobs",
+        title="Pie Chart of Job Proportions",
         yaxis=dict(title="Values"),
         xaxis=dict(title="Counts")
     )
