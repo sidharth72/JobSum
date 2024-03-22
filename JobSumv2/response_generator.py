@@ -17,19 +17,22 @@ def chat_with_gemini(prompt):
             yield chunk.text
         
         # Remove some chats from the history to reduce input overload to the model.
+        print(model.count_tokens(chat.history))
         if len(chat.history) > 10:
             indices_to_delete = list(range(1, len(chat.history) - 3))
             for index in sorted(indices_to_delete, reverse=True):
                 del chat.history[index] 
+
     except Exception as e:
         return st.error(f"An Error Occured! Please Try Again. {e}")
 
 
-def generate_description_string(df, slice_number, full = False):
+def generate_description_string(df, slice_number, full=False):
     if not full:
-        return '\n'.join(f'{i + 1}. {desc}' for i, desc in enumerate(df['description'][:slice_number], start=0))
+        return '\n'.join('{}. {}'.format(i + 1, desc.replace("\n", " ")) for i, desc in enumerate(df['description'][:slice_number], start=0))
     else:
-        return '\n'.join(f'{i + 1}. {desc}' for i, desc in enumerate(df['description'], start = 0))
+        return '\n'.join('{}. {}'.format(i + 1, desc.replace("\n", " ")) for i, desc in enumerate(df['description'], start=0))
+
 
 def set_initial_message():
     # Clearning the chat history when user creates new dataset

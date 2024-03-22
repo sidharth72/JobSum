@@ -118,7 +118,7 @@ def extraction_tab():
                 st.session_state.df = df  # Add to the session_state
 
                 # Description String combines all the description generated for the model to summarize   
-                st.session_state.desc_string = generate_description_string(df, 30, False)
+                st.session_state.desc_string = generate_description_string(df, 35, False)
                 st.success("Data Extraction Complete!")
             except Exception as e:
                 st.error(f"Sorry, there is a problem: {e}")
@@ -204,8 +204,8 @@ def visualization_tab():
                     try:
                         st.session_state.barplot = generate_bar_plots()
                         st.plotly_chart(st.session_state.barplot)
-                    except:
-                        st.error(f"Sorry, the model not able to generate visuals. Please try extracting again")
+                    except Exception as e:
+                        st.error(f"Sorry, the model not able to generate visuals. Please try extracting again {e}")
                 else:
                     st.plotly_chart(st.session_state.barplot)
 
