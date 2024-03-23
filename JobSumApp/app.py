@@ -1,9 +1,9 @@
 import streamlit as st
-from generate_df import generate_dataframe
-from download_csv import get_table_download_link
-from response_generator import chat_with_gemini
-from response_generator import generate_description_string, set_initial_message
-from visualization import generate_bar_plots, generate_pie_plots, generate_bubble_plots
+from response.generate_df import generate_dataframe
+from response.download_csv import get_table_download_link
+from response.response_generator import chat_with_gemini
+from response.response_generator import generate_description_string, set_initial_message
+from Visuals.visualization import generate_bar_plots, generate_pie_plots, generate_bubble_plots
 
 def home_tab():
     """ Home Tab"""

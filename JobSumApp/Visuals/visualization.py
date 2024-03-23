@@ -1,9 +1,9 @@
 import streamlit as st
 import numpy as np
-from response_generator import get_json, preprocess_json_string
+from response.response_generator import get_json, preprocess_json_string
 import plotly.graph_objs as go
-from response_generator import generate_description_string
-from response_generator import get_title_counts
+from response.response_generator import generate_description_string
+from response.response_generator import get_title_counts
 
 def count_occurrences(data_dict):
     occurrences = {}
