@@ -1,9 +1,11 @@
 import streamlit as st
-from response.generate_df import generate_dataframe
-from response.download_csv import get_table_download_link
-from response.response_generator import chat_with_gemini
-from response.response_generator import generate_description_string, set_initial_message
-from Visuals.visualization import generate_bar_plots, generate_pie_plots, generate_bubble_plots
+from generate_df import generate_dataframe
+from download_csv import get_table_download_link
+from response_generator import chat_with_gemini
+from response_generator import generate_description_string, set_initial_message
+from visualization import generate_bar_plots, generate_pie_plots, generate_bubble_plots
+from response_generator import model
+from preprocess import find_valid_description
 
 def home_tab():
     """ Home Tab"""
@@ -45,10 +47,6 @@ def extraction_tab():
     """Data Extraction Tab"""
 
     st.title("Fetch Job Data.")
-    st.write(
-        '<div style="opacity: 0.7;">Extract data from various sites by providing necessary details.</div>',
-            unsafe_allow_html=True
-        )
     st.markdown("<br>", unsafe_allow_html=True)
 
     with st.expander("💡 Tips", expanded=False):
@@ -70,13 +68,13 @@ def extraction_tab():
     col1, col2 = st.columns(2)
 
     with col1:
-        site_name = st.selectbox("Select Site Name", ["Indeed", "Linkedin", "Zip_recruiter", "Glassdoor"])
+        site_name = st.selectbox("Select Site Name", ["Indeed", "Linkedin", "Zip recruiter", "Glassdoor"])
     with col2:
-        location = st.text_input("Location: Optional", key="location_input", placeholder='Enter Location to search for')
-    search_term = st.text_input("Search Term", key="search_term_input", placeholder='Enter Job Role, Eg: Data Scientist')
+        location = st.text_input("Location: Optional", key="location_input", placeholder='Enter Location to search')
+    search_term = st.text_input("Search Term", key="search_term_input", placeholder='Eg: Data Science')
     col3, col4 = st.columns(2)
     with col3:
-        results_wanted = st.number_input("Results Wanted", min_value=1, max_value=500, step=1)
+        results_wanted = st.number_input("Results Wanted", min_value=1, max_value=1000, step=1)
     with col4:
         if site_name == "Indeed":
             country = st.text_input("Country: Optional", key="country_input", placeholder='Enter Country')
@@ -92,8 +90,7 @@ def extraction_tab():
     if 'desc_string' not in st.session_state:
         st.session_state.desc_string = ""
 
-    if 'search_term' not in st.session_state:
-        st.session_state.search_term = search_term
+    st.session_state.search_term = search_term
 
     extract_button = None
     if search_term  == "":
@@ -111,14 +108,24 @@ def extraction_tab():
         st.session_state.messages = [{'role':'assistant', 'content':'How may I help you?'}]
 
         with st.status("Extracting Data ... Please Wait", expanded=True):  
-            st.write("Generating DataFrame ...")
             try:
                 # Generate the dataframe from details
+                st.write("Generating DataFrame ...")
                 df = generate_dataframe(site_name, search_term, location, results_wanted, country)
                 st.session_state.df = df  # Add to the session_state
 
                 # Description String combines all the description generated for the model to summarize   
-                st.session_state.desc_string = generate_description_string(df, 35, False)
+                total_desc_count = 30
+                desc_string = ""
+                st.write("Validating Descriptions ...")
+                desc_string = find_valid_description(df, total_desc_count, model)
+
+                if desc_string:
+                    st.session_state.desc_string = desc_string
+                else:
+                    st.error("No valid description found.")
+                
+
                 st.success("Data Extraction Complete!")
             except Exception as e:
                 st.error(f"Sorry, there is a problem: {e}")
@@ -127,7 +134,7 @@ def extraction_tab():
         with st.status("Fetching Descriptions ... Please Wait", expanded = True):
             st.write("Setting Descriptions ... This will take a few moments.")
             try:
-                set_initial_message()
+                set_initial_message(st.session_state.desc_string)
                 st.success("Descriptions Set Successfully!")
             except Exception as e:
                 st.error(f"Sorry, there is a problem: {e}")
@@ -160,18 +167,21 @@ def chat_tab():
         try:
             st.write(
                 f"""
-                    * Identify the top 5 skills mentioned across all job descriptions.
+                    * Identify the top 10 skills mentioned across all job descriptions.
                     * What are the most common experience levels required for jobs?
-                    * What are the emerging job trends in the {st.session_state.search_term} based on recent job descriptions?
-                    * Which locations have the highest demand for {st.session_state.search_term} positions?
-                    * Can you summarize the primary responsibilities mentioned in job descriptions for {st.session_state.search_term}?
+                    * What are the emerging job trends based on recent job descriptions?
+                    * Which locations have the highest demand for this position?
+                    * Can you summarize the primary responsibilities mentioned in job descriptions?
                     * Can you identify any patterns related to remote work or flexible schedules in the job descriptions?
                     * Do job descriptions from different regions emphasize different aspects? If so, what are they?
                     * What soft skills are frequently mentioned in job postings?
+
+                    * Provide top resources for mastering various technologies to become a proficient full-stack developer within a 3 to 4 month timeframe, along with a comprehensive study plan.
                 """
             )
         except:
             pass
+        
 
     for message in st.session_state.messages:
         with st.chat_message(message['role']):
@@ -205,7 +215,7 @@ def visualization_tab():
                         st.session_state.barplot = generate_bar_plots()
                         st.plotly_chart(st.session_state.barplot)
                     except Exception as e:
-                        st.error(f"Sorry, the model not able to generate visuals. Please try extracting again {e}")
+                        st.error(f"Sorry, the model not able to generate visuals. Please try extracting again.")
                 else:
                     st.plotly_chart(st.session_state.barplot)
 
@@ -213,8 +223,8 @@ def visualization_tab():
         col1, col2 = st.columns(2)
         col2.markdown("<div style='width: 1px; height: 28px;'></div>", unsafe_allow_html=True)
         with col1:
-            threshold_setting =  st.selectbox("Select Threshold", 
-                                              [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], 
+            threshold_setting =  st.select_slider("Select Threshold", 
+                                              options = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], 
                                               help="What portion of the data is needed for plotting?"
                                               )
             
@@ -255,16 +265,23 @@ if __name__ == "__main__":
 
     # Create tabs
     tabs = ["Home", "Data Extraction", "AI Conversation", "Data Summary & Insights", "About"]
-    current_tab = st.sidebar.selectbox("Current Tab", tabs)
+    current_tab = st.sidebar.radio(
+    "Select",
+    [":rainbow[**Home**]", "**Data Extraction**", "**Data Summary & Insights**", "**AI Conversation**"],
+    captions = [
+        "", 
+        "Extract job information as CSV.", 
+        "See Insights about job distribution, high demand skills, etc through visual plots.",
+        "Chat with the AI model to summarize job requirements in no time."])
 
     # Display content based on the selected tab
-    if current_tab == "Home":
+    if current_tab == ":rainbow[**Home**]":
         home_tab()
-    elif current_tab == "Data Extraction":
+    elif current_tab == "**Data Extraction**":
         extraction_tab()
-    elif current_tab == "AI Conversation":
-        chat_tab()
-    elif current_tab == "Data Summary & Insights":
+    elif current_tab == "**Data Summary & Insights**":
         visualization_tab()
+    elif current_tab == "**AI Conversation**":
+        chat_tab()
     elif current_tab == "About":
         st.title("About")

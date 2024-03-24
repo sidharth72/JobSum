@@ -79,6 +79,7 @@ sniffio
 soupsieve
 SQLAlchemy
 streamlit
+streamlit-option-menu
 tenacity
 tls-client
 toml
