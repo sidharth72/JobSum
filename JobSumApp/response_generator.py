@@ -1,12 +1,12 @@
 import json
 import streamlit as st
 import google.generativeai as genai
-from config import API_KEY
+#from config import API_KEY
 import re
 import json
 from json_retrieval_prompt import retrieve_prompt
 
-genai.configure(api_key = API_KEY)
+genai.configure(api_key = st.secrets['API_KEY'])
 
 # Set up the model
 # generation_config = {
