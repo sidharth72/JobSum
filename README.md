@@ -1,3 +1,5 @@
+# 🧩 **Welcome to JobSum!**
+
 #### What is it?
 
 **JobSum** is a job summarization and interactive app build using streamlit designed to make your job search process easier and more efficient. It utilizes data fetched from popular websites like Indeed, LinkedIn, Glassdoor, ZipRecruiter, and more, and provides a personalized and comprehensive job summary for each search query. Let's dive into how this tool works and the features it offers.
