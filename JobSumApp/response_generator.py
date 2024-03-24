@@ -19,6 +19,8 @@ genai.configure(api_key = st.secrets['API_KEY'])
 model = genai.GenerativeModel('gemini-1.0-pro')
 chat = model.start_chat(history = [])
 
+
+@st.cache_data
 def chat_with_gemini(prompt):
     try:
         response = chat.send_message(prompt, stream = True)
@@ -42,7 +44,7 @@ def generate_description_string(df, slice_number, full=False):
     else:
         return '\n'.join('{}. {}'.format(i + 1, desc.replace("\n", " ")) for i, desc in enumerate(df['description'], start=0))
 
-
+@st.cache_data
 def set_initial_message(string):
     # Clearning the chat history when user creates new dataset
     chat.history.clear()

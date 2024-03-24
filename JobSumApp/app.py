@@ -176,7 +176,7 @@ def chat_tab():
                     * Do job descriptions from different regions emphasize different aspects? If so, what are they?
                     * What soft skills are frequently mentioned in job postings?
 
-                    * Provide top resources for mastering various technologies to become a proficient full-stack developer within a 3 to 4 month timeframe, along with a comprehensive study plan.
+                    * Provide top resources for mastering various technologies to become proficient in {st.session_state.search_term} within a 3 to 4 month timeframe, along with a comprehensive study plan.
                 """
             )
         except:
@@ -263,25 +263,54 @@ def visualization_tab():
 if __name__ == "__main__":
     st.set_page_config(page_title="JobSum - Job Summary & Analysis")
 
-    # Create tabs
-    tabs = ["Home", "Data Extraction", "AI Conversation", "Data Summary & Insights", "About"]
-    current_tab = st.sidebar.radio(
-    "Select",
-    [":rainbow[**Home**]", "**Data Extraction**", "**Data Summary & Insights**", "**AI Conversation**"],
+    # Radio buttons
+    feature_tabs = st.sidebar.radio(
+    "Features",
+    [
+        ":rainbow[**Home**]", 
+        "**Data Extraction**", 
+        "**Data Summary & Insights**", 
+        "**AI Conversation**", 
+        ],
     captions = [
         "", 
         "Extract job information as CSV.", 
         "See Insights about job distribution, high demand skills, etc through visual plots.",
         "Chat with the AI model to summarize job requirements in no time."])
+    
 
     # Display content based on the selected tab
-    if current_tab == ":rainbow[**Home**]":
+    if feature_tabs == ":rainbow[**Home**]":
         home_tab()
-    elif current_tab == "**Data Extraction**":
+    elif feature_tabs == "**Data Extraction**":
         extraction_tab()
-    elif current_tab == "**Data Summary & Insights**":
+    elif feature_tabs == "**Data Summary & Insights**":
         visualization_tab()
-    elif current_tab == "**AI Conversation**":
+    elif feature_tabs == "**AI Conversation**":
         chat_tab()
-    elif current_tab == "About":
-        st.title("About")
+
+
+    st.sidebar.markdown("""  
+    <style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: transparent;
+        padding: 10px;
+        text-align: left;
+        font-size: 15px;
+    }
+    .footer a{
+        text-decoration:none;
+        margin-left: 10px;
+    }
+    </style>
+    <div class="footer">
+    <a href="https://github.com/sidharth72/JobSum/issues">Feedback</a>
+    <a href="https://github.com/sidharth72/JobSum">Contributions</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+
