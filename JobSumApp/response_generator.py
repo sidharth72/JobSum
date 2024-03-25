@@ -43,7 +43,6 @@ def generate_description_string(df, slice_number, full=False):
     else:
         return '\n'.join('{}. {}'.format(i + 1, desc.replace("\n", " ")) for i, desc in enumerate(df['description'], start=0))
 
-@st.cache_data
 def set_initial_message(string):
     # Clearning the chat history when user creates new dataset
     chat.history.clear()
