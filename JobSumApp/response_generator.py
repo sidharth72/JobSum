@@ -20,7 +20,6 @@ model = genai.GenerativeModel('gemini-1.0-pro')
 chat = model.start_chat(history = [])
 
 
-@st.cache_data
 def chat_with_gemini(prompt):
     try:
         response = chat.send_message(prompt, stream = True)
