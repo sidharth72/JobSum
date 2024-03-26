@@ -7,10 +7,8 @@ from json_retrieval_prompt import retrieve_prompt
 import os
 
 genai.configure(api_key = st.secrets['API_KEY'])
-
 model = genai.GenerativeModel('gemini-1.0-pro')
 chat = model.start_chat(history = [])
-
 
 def chat_with_gemini(prompt):
     try:
