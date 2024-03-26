@@ -15,10 +15,8 @@ def extract_integer_from_string(input_string):
         return None  # Return None if no integer is found in the string
     
 
-
 def find_valid_description(df, total_desc_count, model):
     pattern = r'\b\d+\b'  # Compile the regular expression pattern outside the loop
-
     for i in range(total_desc_count, -1, -1):
         desc_string = generate_description_string(df, i, False)
         total_tokens = str(model.count_tokens(desc_string))

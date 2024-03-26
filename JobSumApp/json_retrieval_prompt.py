@@ -2,7 +2,7 @@ import streamlit as st
 
 def retrieve_prompt(search_term):
     prompt = f"""
-        Extract as much as distinct, important skill and requirement keywords related to {search_term} from this job descriptions. Here is how the format needed:
+            Your task is to meticulously review the provided job descriptions and extract distinct, essential keywords pertaining to the {search_term} role. Please categorize the extracted keywords into the following JSON format:
 
             General Keywords (List[words]):
             Skills (List[words]):
@@ -16,13 +16,14 @@ def retrieve_prompt(search_term):
             Industry (List[words]):
             Company Culture (List[words]):
 
-            Instructions while filling:
+            To ensure optimal results, adhere to the following guidelines:
 
-            1. Fill those and give it as a JSON file, values must be a list.
-            2. Don't Give any other suggestion or comments.
-            3. Ensure that the terms provided are highly relevant to the job role and reflect the skills, qualifications, soft skills, technologies, experience, responsibilities, industry, and company culture associated with {search_term}.
-            4. Each item inside the list must be a word of term related to the role (as required).
-            5. Fill all the fields; it's mandatory.
+            1. Populate each category with a list of relevant terms, not sentences.
+            2. Ensure that the extracted keywords are highly specific and accurately reflect the core aspects of the {search_term} role, including required skills, qualifications, soft skills, technologies, experience, responsibilities, industry, and company culture.
+            3. Each list item should be a concise, role-related word or term.
+            4. Populate all categories with at least one relevant keyword; do not leave any category empty.
+            5. Avoid including redundant or overly general terms that do not provide meaningful insights into the {search_term} role.
+            6. Do not include any additional suggestions, comments, or explanations in the output.
 
         """
     
