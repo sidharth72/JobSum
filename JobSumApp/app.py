@@ -7,6 +7,7 @@ from visualization import generate_bar_plots, generate_pie_plots, generate_bubbl
 from response_generator import model
 from preprocess import find_valid_description
 
+
 def home_tab():
     """ Home Tab"""
     # Title

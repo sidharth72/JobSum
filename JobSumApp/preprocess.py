@@ -24,5 +24,4 @@ def find_valid_description(df, total_desc_count, model):
         
         if total_tokens_int and total_tokens_int <= 27000:
             return desc_string
-
     return None 

@@ -1,20 +1,12 @@
 import json
 import streamlit as st
 import google.generativeai as genai
-#from config import API_KEY
 import re
 import json
 from json_retrieval_prompt import retrieve_prompt
+import os
 
 genai.configure(api_key = st.secrets['API_KEY'])
-
-# Set up the model
-# generation_config = {
-#   "temperature": 0.9,
-#   "top_p": 1,
-#   "top_k": 1,
-#   "max_output_tokens": 1024,
-# }
 
 model = genai.GenerativeModel('gemini-1.0-pro')
 chat = model.start_chat(history = [])
