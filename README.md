@@ -2,11 +2,11 @@
 
 #### What is it?
 
-**JobSum** is a job summarization and interactive app build using streamlit designed to make your job search process easier and more efficient. It utilizes data fetched from popular websites like Indeed, LinkedIn, Glassdoor, ZipRecruiter, and more, and provides a personalized and comprehensive job summary for each search query. Let's dive into how this tool works and the features it offers.
+**JobSum** is a job summarization and interactive app built using Streamlit, designed to make your job search process easier and more efficient. It utilizes data fetched from popular websites like Indeed, LinkedIn, Glassdoor, ZipRecruiter, and more, and provides a personalized and comprehensive job summary for each search query. Let's dive into how this tool works and the features it offers.
 
 #### How it Works?
 
-The JobSum tool leverages an advanced LLM model (Gemini-Google) to analyze and understand hundreds of job descriptions in a matter of seconds. The AI can extract essential information such as required skills, experience levels, interview insights, and can even give tutorials and guides to refer for the job. This process saves you valuable time that would otherwise be spent manually reading through numerous job postings.
+The JobSum tool leverages an advanced LLM model (Gemini-Google) to analyze and understand hundreds of job descriptions in a matter of seconds. The AI can extract essential information such as required skills, experience levels, interview insights, and can even give tutorials and guides to refer to for the job. This process saves you valuable time that would otherwise be spent manually reading through numerous job postings.
 
 #### Features
 
@@ -19,3 +19,34 @@ The JobSum tool leverages an advanced LLM model (Gemini-Google) to analyze and u
 ### Welcome Contributions!
 
 Welcome contributions from the community to improve JobSum. Whether it's adding new features, fixing bugs, or enhancing documentation, every contribution matters!
+
+### Running Local Setup
+
+To run JobSum locally, follow these steps:
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/sidharth72/JobSum
+    ```
+
+2. Change path to:
+
+   ```bash
+    cd JobSum/JobSumApp
+   ```
+
+3. Install the required dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Configure your Gemini API key, To get the key go to https://aistudio.google.com/app/apikey
+    ```bash
+    python config.py
+    ```
+   Enter Your API KEY when prompted. Your API key will be saved to secrets.toml.
+
+5. Run the application using Streamlit:
+    ```bash
+    streamlit run app.py
+    ```
