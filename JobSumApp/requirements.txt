@@ -64,6 +64,7 @@ pydeck
 Pygments
 pyparsing
 python-dateutil
+python-dotenv
 python-jobspy
 pytz
 PyYAML
@@ -78,6 +79,7 @@ smmap
 sniffio
 soupsieve
 SQLAlchemy
+st-pages
 streamlit
 streamlit-option-menu
 tenacity
