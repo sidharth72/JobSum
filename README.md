@@ -29,18 +29,24 @@ To run JobSum locally, follow these steps:
     git clone https://github.com/sidharth72/JobSum
     ```
 
-2. Install the required dependencies:
+2. Change path to:
+
+   ```bash
+    cd JobSum/JobSumApp
+   ```
+
+3. Install the required dependencies:
     ```bash
     pip install -r requirements.txt
     ```
 
-3. Configure your API key:
+4. Configure your API key:
     ```bash
     python config.py
     ```
    Enter Your API KEY when prompted. Your API key will be saved to secrets.toml.
 
-4. Run the application using Streamlit:
+5. Run the application using Streamlit:
     ```bash
     streamlit run app.py
     ```
