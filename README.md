@@ -40,7 +40,7 @@ To run JobSum locally, follow these steps:
     pip install -r requirements.txt
     ```
 
-4. Configure your API key:
+4. Configure your Gemini API key, To get the key go to https://aistudio.google.com/app/apikey
     ```bash
     python config.py
     ```
