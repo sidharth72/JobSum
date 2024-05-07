@@ -108,24 +108,27 @@ def extraction_tab():
         st.session_state.bubbleplot = None
         st.session_state.messages = [{'role':'assistant', 'content':'How may I help you?'}]
 
-        with st.status("Extracting Data ... Please Wait", expanded=True):  
-            # Generate the dataframe from details
-            st.write("Generating DataFrame ...")
-            df = generate_dataframe(site_name, search_term, location, results_wanted, country)
-            st.session_state.df = df  # Add to the session_state
+        with st.status("Extracting Data ... Please Wait", expanded=True):
+            try:
+                # Generate the dataframe from details
+                st.write("Generating DataFrame ...")
+                df = generate_dataframe(site_name, search_term, location, results_wanted, country)
+                st.session_state.df = df  # Add to the session_state
 
-            # Description String combines all the description generated for the model to summarize   
-            total_desc_count = 30
-            desc_string = ""
-            st.write("Validating Descriptions ...")
-            desc_string = find_valid_description(df, total_desc_count, model)
+                # Description String combines all the description generated for the model to summarize   
+                total_desc_count = 30
+                desc_string = ""
+                st.write("Validating Descriptions ...")
+                desc_string = find_valid_description(df, total_desc_count, model)
 
-            if desc_string:
-                st.session_state.desc_string = desc_string
-            else:
-                st.error("No valid description found.")
-    
-            st.success("Data Extraction Complete!")
+                if desc_string:
+                    st.session_state.desc_string = desc_string
+                else:
+                    st.error("No valid description found.")
+        
+                st.success("Data Extraction Complete!")
+            except Exception as e:
+                st.error(f"error occured: {e}")
 
         
         # Passing the initial System Message
