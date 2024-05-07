@@ -80,7 +80,12 @@ sniffio
 soupsieve
 SQLAlchemy
 st-pages
+<<<<<<< HEAD
 streamlit
+=======
+streamlit==1.32.0
+streamlit-option-menu
+>>>>>>> f9a125406c2d13355327c17eac1c1380855c4a4b
 tenacity
 tls-client
 toml
