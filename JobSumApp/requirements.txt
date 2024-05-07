@@ -65,7 +65,7 @@ Pygments
 pyparsing
 python-dateutil
 python-dotenv
-python-jobspy
+python-jobspy>=1.1.52
 pytz
 PyYAML
 referencing
