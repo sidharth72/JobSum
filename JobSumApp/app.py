@@ -69,7 +69,7 @@ def extraction_tab():
     col1, col2 = st.columns(2)
 
     with col1:
-        site_name = st.selectbox("Select Site Name", ["Indeed", "Linkedin", "Zip recruiter", "Glassdoor"], key="select_site",)
+        site_name = st.selectbox("Select Site Name", ["indeed", "linkedlin", "zip_recruiter", "glassdoor"], key="select_site",)
     with col2:
         location = st.text_input("Location: Optional", key="location_input", placeholder='Enter Location to search')
     search_term = st.text_input("Search Term", key="search_term_input", placeholder='Eg: Data Science')
@@ -77,12 +77,12 @@ def extraction_tab():
     with col3:
         results_wanted = st.number_input("Results Wanted", key="results_wanted", min_value=1, max_value=1000, step=1)
     with col4:
-        if site_name == "Indeed":
+        if site_name == "indeed":
             country = st.text_input("Country: Optional", key="country_input", placeholder='Enter Country')
         else:
             country = st.text_input("Country: Optional", key="country_input", placeholder='Enter Country', disabled=True)
 
-    if site_name == 'Linkedin':
+    if site_name == 'linkedin':
         st.warning(
             "Selecting LinkedIn might not provide job descriptions, which could limit the model's ability to generate responses accurately."
             )
