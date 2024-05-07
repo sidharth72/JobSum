@@ -81,7 +81,6 @@ soupsieve
 SQLAlchemy
 st-pages
 streamlit
-streamlit-option-menu
 tenacity
 tls-client
 toml
