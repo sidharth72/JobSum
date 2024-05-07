@@ -109,26 +109,24 @@ def extraction_tab():
         st.session_state.messages = [{'role':'assistant', 'content':'How may I help you?'}]
 
         with st.status("Extracting Data ... Please Wait", expanded=True):  
-            try:
-                # Generate the dataframe from details
-                st.write("Generating DataFrame ...")
-                df = generate_dataframe(site_name, search_term, location, results_wanted, country)
-                st.session_state.df = df  # Add to the session_state
+            # Generate the dataframe from details
+            st.write("Generating DataFrame ...")
+            df = generate_dataframe(site_name, search_term, location, results_wanted, country)
+            st.session_state.df = df  # Add to the session_state
 
-                # Description String combines all the description generated for the model to summarize   
-                total_desc_count = 30
-                desc_string = ""
-                st.write("Validating Descriptions ...")
-                desc_string = find_valid_description(df, total_desc_count, model)
+            # Description String combines all the description generated for the model to summarize   
+            total_desc_count = 30
+            desc_string = ""
+            st.write("Validating Descriptions ...")
+            desc_string = find_valid_description(df, total_desc_count, model)
 
-                if desc_string:
-                    st.session_state.desc_string = desc_string
-                else:
-                    st.error("No valid description found.")
-        
-                st.success("Data Extraction Complete!")
-            except Exception as e:
-                st.error(f"Sorry, there is a problem: {e}")
+            if desc_string:
+                st.session_state.desc_string = desc_string
+            else:
+                st.error("No valid description found.")
+    
+            st.success("Data Extraction Complete!")
+
         
         # Passing the initial System Message
         with st.status("Fetching Descriptions ... Please Wait", expanded = True):
