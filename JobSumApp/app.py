@@ -69,7 +69,7 @@ def extraction_tab():
     col1, col2 = st.columns(2)
 
     with col1:
-        site_name = st.selectbox("Select Site Name", ["indeed", "linkedlin", "zip_recruiter", "glassdoor"], key="select_site",)
+        site_name = st.selectbox("Select Site Name", ["indeed", "linkedin", "zip_recruiter", "glassdoor"], key="select_site")
     with col2:
         location = st.text_input("Location: Optional", key="location_input", placeholder='Enter Location to search')
     search_term = st.text_input("Search Term", key="search_term_input", placeholder='Eg: Data Science')
